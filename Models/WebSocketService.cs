@@ -8,6 +8,11 @@ using MAI.Services;
 
 namespace MAI.Models
 {
+    /// <summary>
+    /// Manages WebSocket connections for receiving incident updates and caching them.
+    /// This service connects to a WebSocket server, receives incident messages,
+    /// caches unique incidents, and triggers notifications.
+    /// </summary>
     public class WebSocketService
     {
         private readonly ClientWebSocket _webSocket = new ClientWebSocket();
@@ -15,10 +20,17 @@ namespace MAI.Models
         private readonly NotificationService _notificationService;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
+        /// <summary>
+        /// Occurs when a new incident is received from the WebSocket.
+        /// </summary>
         public event System.Action<Incident>? OnIncidentReceived;
 
         private const string IncidentIdsCacheKey = "IncidentIds";
 
+        /// <summary>
+        /// Retrieves all cached incidents.
+        /// </summary>
+        /// <returns>A list of <see cref="Incident"/> objects currently in the cache.</returns>
         public List<Incident> GetAllIncidents()
         {
             var incidentIds = _cache.Get<List<string>>(IncidentIdsCacheKey);
@@ -39,12 +51,22 @@ namespace MAI.Models
         }
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebSocketService"/> class.
+        /// </summary>
+        /// <param name="cache">The <see cref="IMemoryCache"/> instance for caching incidents.</param>
+        /// <param name="notificationService">The <see cref="NotificationService"/> for displaying notifications.</param>
         public WebSocketService(IMemoryCache cache, NotificationService notificationService)
         {
             _cache = cache;
             _notificationService = notificationService;
         }
 
+        /// <summary>
+        /// Establishes a WebSocket connection to the specified URI and starts listening for messages.
+        /// </summary>
+        /// <param name="uri">The URI of the WebSocket server.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous connection operation.</returns>
         public async Task ConnectAsync(string uri)
         {
             try
@@ -59,6 +81,12 @@ namespace MAI.Models
             }
         }
 
+        /// <summary>
+        /// Continuously receives messages from the WebSocket connection.
+        /// Deserializes incoming messages as <see cref="Incident"/> objects,
+        /// caches them, and triggers the <see cref="OnIncidentReceived"/> event and a notification.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous message receiving operation.</returns>
         private async Task ReceiveMessagesAsync()
         {
             var buffer = new byte[1024 * 4];
@@ -93,6 +121,10 @@ namespace MAI.Models
             }
         }
 
+        /// <summary>
+        /// Closes the WebSocket connection if it is currently open.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous disconnection operation.</returns>
         public async Task DisconnectAsync()
         {
             if (_webSocket.State == WebSocketState.Open)
@@ -102,9 +134,19 @@ namespace MAI.Models
         }
     }
 
+    /// <summary>
+    /// Represents a wrapper for incident data received over WebSocket.
+    /// This structure is used for deserializing the JSON payload from the WebSocket server.
+    /// </summary>
     public class IncidentWrapper
     {
+        /// <summary>
+        /// Gets or sets the type of the message, e.g., "incident".
+        /// </summary>
         public string type { get; set; } = string.Empty;
+        /// <summary>
+        /// Gets or sets the <see cref="Incident"/> payload contained within the message.
+        /// </summary>
         public Incident payload { get; set; } = new Incident();
     }
 }

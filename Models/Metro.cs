@@ -1,20 +1,50 @@
 namespace MAI.Models
 {
+    /// <summary>
+    /// Represents a single metro station with its name and geographical coordinates.
+    /// </summary>
     public class Station
     {
+        /// <summary>
+        /// Gets or sets the name of the metro station.
+        /// </summary>
         public string Name { get; set; } = string.Empty;
+        /// <summary>
+        /// Gets or sets the latitude coordinate of the metro station.
+        /// </summary>
         public double Latitude { get; set; }
+        /// <summary>
+        /// Gets or sets the longitude coordinate of the metro station.
+        /// </summary>
         public double Longitude { get; set; }
     }
 
+    /// <summary>
+    /// Represents a metro line with its name and a list of stations it serves.
+    /// </summary>
     public class MetroLine
     {
+        /// <summary>
+        /// Gets or sets the name of the metro line.
+        /// </summary>
         public string Name { get; set; } = string.Empty;
+        /// <summary>
+        /// Gets or sets the list of station names belonging to this metro line.
+        /// </summary>
         public List<string> Stations { get; set; } = new List<string>();
     }
 
+    /// <summary>
+    /// Provides static data for metro stations and lines, specifically for the Mexico City Metro system.
+    /// This includes a dictionary of all stations with their geographical data and a list of metro lines
+    /// with their respective stations.
+    /// </summary>
     public static class MetroData
     {
+        /// <summary>
+        /// A dictionary containing all known metro stations, mapped by their name.
+        /// Each key is a station name string, and its value is a <see cref="Station"/> object.
+        /// </summary>
         public static Dictionary<string, Station> Stations = new Dictionary<string, Station>
         {
             { "Observatorio", new Station { Name = "Observatorio", Latitude = 19.3982, Longitude = -99.2004 } },
@@ -113,6 +143,7 @@ namespace MAI.Models
             { "Polanco", new Station { Name = "Polanco", Latitude = 19.4337, Longitude = -99.1910 } },
             { "Auditorio", new Station { Name = "Auditorio", Latitude = 19.4248, Longitude = -99.1927 } },
             { "Constituyentes", new Station { Name = "Constituyentes", Latitude = 19.4118, Longitude = -99.1921 } },
+            { "Tacubaya", new Station { Name = "Tacubaya", Latitude = 19.4032, Longitude = -99.1871 } },
             { "San Pedro de los Pinos", new Station { Name = "San Pedro de los Pinos", Latitude = 19.3906, Longitude = -99.1854 } },
             { "San Antonio", new Station { Name = "San Antonio", Latitude = 19.3835, Longitude = -99.1855 } },
             { "Mixcoac", new Station { Name = "Mixcoac", Latitude = 19.3757, Longitude = -99.1876 } },
@@ -182,6 +213,9 @@ namespace MAI.Models
             { "Tláhuac", new Station { Name = "Tláhuac", Latitude = 19.2866, Longitude = -99.0145 } },
         };
 
+        /// <summary>
+        /// A list containing definitions for each metro line, including its name and the stations it serves.
+        /// </summary>
         public static List<MetroLine> Lines = new List<MetroLine>
         {
             new MetroLine { Name = "Línea 1", Stations = new List<string> { "Observatorio", "Tacubaya", "Juanacatlán", "Chapultepec", "Sevilla", "Insurgentes", "Cuauhtémoc", "Balderas", "Salto del Agua", "Isabel la Católica", "Pino Suárez", "Merced", "Candelaria", "San Lázaro", "Moctezuma", "Balbuena", "Blvd. Puerto Aéreo", "Gómez Farías", "Zaragoza", "Pantitlán" } },

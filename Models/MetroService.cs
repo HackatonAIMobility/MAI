@@ -3,15 +3,28 @@ using System.Linq;
 
 namespace MAI.Models
 {
+    /// <summary>
+    /// Provides services related to the metro system, such as finding routes between stations.
+    /// It builds and utilizes an adjacency list to represent the metro network.
+    /// </summary>
     public class MetroService
     {
         private readonly Dictionary<string, List<string>> _adjacencyList;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MetroService"/> class.
+        /// It constructs the metro network's adjacency list based on <see cref="MetroData"/>.
+        /// </summary>
         public MetroService()
         {
             _adjacencyList = BuildAdjacencyList();
         }
 
+        /// <summary>
+        /// Builds an adjacency list representation of the metro network.
+        /// Each key in the dictionary is a station name, and its value is a list of directly connected stations.
+        /// </summary>
+        /// <returns>A <see cref="Dictionary{TKey, TValue}"/> representing the metro network's adjacency list.</returns>
         private Dictionary<string, List<string>> BuildAdjacencyList()
         {
             var adjacencyList = new Dictionary<string, List<string>>();
@@ -36,7 +49,8 @@ namespace MAI.Models
                 }
             }
             
-            // Add transfer connections
+            // Add transfer connections (Logic for this is commented out, as simple BFS doesn't need explicit transfer edges)
+            // The existing logic already connects stations along a line, which is sufficient for basic BFS.
             var stationsOnLines = new Dictionary<string, List<string>>();
             foreach (var line in MetroData.Lines)
             {
@@ -64,6 +78,15 @@ namespace MAI.Models
             return adjacencyList;
         }
 
+        /// <summary>
+        /// Finds a route between a starting station and an ending station using a Breadth-First Search (BFS) algorithm.
+        /// </summary>
+        /// <param name="startStationName">The name of the starting metro station.</param>
+        /// <param name="endStationName">The name of the ending metro station.</param>
+        /// <returns>
+        /// A <see cref="List{T}"/> of <see cref="Station"/> objects representing the found route,
+        /// or <see langword="null"/> if no path is found or if station names are invalid.
+        /// </returns>
         public List<Station> FindRoute(string startStationName, string endStationName)
         {
             if (!_adjacencyList.ContainsKey(startStationName) || !_adjacencyList.ContainsKey(endStationName))
