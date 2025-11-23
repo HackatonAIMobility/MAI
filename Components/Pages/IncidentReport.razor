@@ -1,0 +1,93 @@
+@page "/incident-report"
+@using MAI.Models
+@using System.Text
+@using System.Net.Http.Headers
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<h1>Reportar Incidente</h1>
+
+<EditForm Model="@incident" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="title" class="form-label">Título (Opcional)</label>
+        <InputText id="title" class="form-control" @bind-Value="incident.Title" />
+    </div>
+
+    <div class="mb-3">
+        <label for="startStation" class="form-label">Estación de Inicio</label>
+        <InputSelect id="startStation" class="form-select" @bind-Value="incident.StartStation">
+            <option value="">Seleccione una estación</option>
+            @foreach (var stationName in stationNames)
+            {
+                <option value="@stationName">@stationName</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => incident.StartStation)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="endStation" class="form-label">Estación de Fin (Opcional)</label>
+        <InputText id="endStation" class="form-control" @bind-Value="incident.EndStation" />
+    </div>
+
+    <div class="mb-3">
+        <label for="priority" class="form-label">Prioridad</label>
+        <InputSelect id="priority" class="form-select" @bind-Value="incident.Priority">
+            @foreach (var priorityValue in Enum.GetValues<MAI.Models.Priority>())
+            {
+                <option value="@priorityValue">@priorityValue.ToString()</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => incident.Priority)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Reportar</button>
+</EditForm>
+
+@code {
+    private Incident incident = new Incident();
+    private List<string> stationNames = new List<string>();
+
+    protected override void OnInitialized()
+    {
+        incident.ShortDescription = string.Empty; // Not exposed in form
+        incident.Timestamp = DateTime.Now; // Set automatically
+
+        stationNames = MetroData.Stations.Keys.OrderBy(name => name).ToList();
+        
+        // Default priority
+        incident.Priority = MAI.Models.Priority.MEDIUM;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var json = System.Text.Json.JsonSerializer.Serialize(incident);
+            var content = new StringContent(json, Encoding.UTF8, new MediaTypeHeaderValue("application/json"));
+
+            // TODO: Replace with your FastAPI endpoint for incidents
+            var response = await HttpClient.PostAsync("http://localhost:8000/incidents", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Optionally navigate to a confirmation page or incidents list
+                NavigationManager.NavigateTo("/incidents");
+            }
+            else
+            {
+                // Handle error
+                Console.WriteLine($"Error al enviar el incidente: {response.StatusCode}");
+                // Log response content for more details
+                Console.WriteLine(await response.Content.ReadAsStringAsync());
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Excepción al enviar el incidente: {ex.Message}");
+        }
+    }
+}
