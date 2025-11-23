@@ -15,6 +15,7 @@ androidx.coordinatorlayout.widget.CoordinatorLayout;/mnt/ssd1tb/Codigos/MAI/obj/
 androidx.drawerlayout.widget.DrawerLayout;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/164/jl/res/layout/drawer_layout.xml
 androidx.fragment.app.FragmentContainerView;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/164/jl/res/layout/fragment_backstack.xml
 androidx.fragment.app.FragmentContainerView;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/164/jl/res/layout/navigationlayout.xml
+appwidget-provider;obj/Debug/net9.0-android/res/xml/fast_report_widget_info.xml
 attr;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/164/jl/res/values/attr.xml
 attr;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/values/values.xml
 background;obj/Debug/net9.0-android/resizetizer/r/mipmap-anydpi-v26/appicon_round.xml
@@ -27,6 +28,7 @@ bitmap;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/c
 bitmap;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_text_light_normal.xml
 bitmap;obj/Debug/net9.0-android/resizetizer/sp/drawable-v31/maui_splash_image.xml
 bitmap;obj/Debug/net9.0-android/resizetizer/sp/drawable/maui_splash_image.xml
+Button;obj/Debug/net9.0-android/res/layout/widget_fast_report.xml
 cache-path;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/165/jl/res/xml/microsoft_maui_essentials_fileprovider_file_paths.xml
 color;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/164/jl/res/values/colors.xml
 color;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/values/values.xml
@@ -37,6 +39,7 @@ com.google.android.material.appbar.AppBarLayout;/mnt/ssd1tb/Codigos/MAI/obj/Debu
 com.google.android.material.appbar.AppBarLayout;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/164/jl/res/layout/navigationlayout.xml
 corners;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_icon_disabled.xml
 corners;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_text_disabled.xml
+corners;obj/Debug/net9.0-android/res/drawable/widget_rounded_bg.xml
 declare-styleable;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/164/jl/res/values/attr.xml
 declare-styleable;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/values/values.xml
 eat-comment;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/values-af/values.xml
@@ -242,6 +245,7 @@ layer-list;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawab
 layer-list;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_text_light_normal.xml
 layer-list;obj/Debug/net9.0-android/resizetizer/sp/drawable-v31/maui_splash_image.xml
 layer-list;obj/Debug/net9.0-android/resizetizer/sp/drawable/maui_splash_image.xml
+LinearLayout;obj/Debug/net9.0-android/res/layout/widget_fast_report.xml
 microsoft.maui.controls.platform.compatibility.ShellFlyoutLayout;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/162/jl/res/layout/flyoutcontent.xml
 monochrome;obj/Debug/net9.0-android/resizetizer/r/mipmap-anydpi-v26/appicon_round.xml
 monochrome;obj/Debug/net9.0-android/resizetizer/r/mipmap-anydpi-v26/appicon.xml
@@ -439,12 +443,14 @@ shape;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/co
 shape;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_text_dark_focused.xml
 shape;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_text_disabled.xml
 shape;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_text_light_focused.xml
+shape;obj/Debug/net9.0-android/res/drawable/widget_rounded_bg.xml
 solid;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_icon_dark_focused.xml
 solid;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_icon_disabled.xml
 solid;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_icon_light_focused.xml
 solid;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_text_dark_focused.xml
 solid;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_text_disabled.xml
 solid;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_text_light_focused.xml
+solid;obj/Debug/net9.0-android/res/drawable/widget_rounded_bg.xml
 string;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/162/jl/res/values/strings.xml
 string;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/163/jl/res/values/values.xml
 string;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/values-af/values.xml
@@ -615,6 +621,7 @@ stroke;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/c
 stroke;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/174/jl/res/drawable/common_google_signin_btn_text_light_focused.xml
 style;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/164/jl/res/values-v35/styles.xml
 style;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/164/jl/res/values/styles.xml
+TextView;obj/Debug/net9.0-android/res/layout/widget_fast_report.xml
 translate;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/162/jl/res/anim/enterfromleft.xml
 translate;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/162/jl/res/anim/enterfromright.xml
 translate;/mnt/ssd1tb/Codigos/MAI/obj/Debug/net9.0-android/lp/162/jl/res/anim/exittoleft.xml

@@ -1,9 +1,12 @@
-MAI.MainActivity, MAI;crc64a68bb298dd833148.MainActivity
-MAI.MainActivity;crc64a68bb298dd833148.MainActivity
-mai.MainActivity;crc64a68bb298dd833148.MainActivity
+MAI.MainActivity, MAI;com.equipoazul.mai.MainActivity
+MAI.MainActivity;com.equipoazul.mai.MainActivity
+com.equipoazul.mai.MainActivity;com.equipoazul.mai.MainActivity
 MAI.MainApplication, MAI;crc64a68bb298dd833148.MainApplication
 MAI.MainApplication;crc64a68bb298dd833148.MainApplication
 mai.MainApplication;crc64a68bb298dd833148.MainApplication
+MAI.Platforms.Android.FastReportWidget, MAI;com.equipoazul.mai.FastReportWidget
+MAI.Platforms.Android.FastReportWidget;com.equipoazul.mai.FastReportWidget
+com.equipoazul.mai.FastReportWidget;com.equipoazul.mai.FastReportWidget
 GoogleGson.IExclusionStrategy, GoogleGson;com.google.gson.ExclusionStrategy
 GoogleGson.IExclusionStrategy;com.google.gson.ExclusionStrategy
 com.google.gson.ExclusionStrategy;com.google.gson.ExclusionStrategy
