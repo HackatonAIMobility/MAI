@@ -4,13 +4,13 @@ html, body {
 }
 
 a, .btn-link {
-    color: #006bb7;
+    color: #FD1D1D;
 }
 
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #FD1D1D;
+    border-color: #C21717;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {

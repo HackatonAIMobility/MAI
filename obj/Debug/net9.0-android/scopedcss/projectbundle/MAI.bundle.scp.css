@@ -10,11 +10,11 @@ main[b-szwvlflheb] {
 }
 
 .sidebar[b-szwvlflheb] {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    background-image: linear-gradient(180deg, rgb(253, 29, 29) 0%, #C21717 70%);
 }
 
 .top-row[b-szwvlflheb] {
-    background-color: #f7f7f7;
+    background-color: #FD1D1D;
     border-bottom: 1px solid #d6d5d5;
     justify-content: flex-end;
     height: 3.5rem;
@@ -96,7 +96,7 @@ main[b-szwvlflheb] {
 
 .top-row[b-tdfnrv8jd3] {
     height: 3.5rem;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(253, 29, 29, 0.7);
 }
 
 .navbar-brand[b-tdfnrv8jd3] {
@@ -148,12 +148,12 @@ main[b-szwvlflheb] {
     }
 
         .nav-item[b-tdfnrv8jd3]  a.active {
-            background-color: rgba(255,255,255,0.37);
+            background-color: rgba(253,29,29,0.37);
             color: white;
         }
 
         .nav-item[b-tdfnrv8jd3]  a:hover {
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(253,29,29,0.1);
             color: white;
         }
 

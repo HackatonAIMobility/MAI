@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using MAI.Services;
 
 namespace MAI.Models
 {
@@ -11,6 +12,7 @@ namespace MAI.Models
     {
         private readonly ClientWebSocket _webSocket = new ClientWebSocket();
         private readonly IMemoryCache _cache;
+        private readonly NotificationService _notificationService;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         public event System.Action<Incident>? OnIncidentReceived;
@@ -37,9 +39,10 @@ namespace MAI.Models
         }
 
 
-        public WebSocketService(IMemoryCache cache)
+        public WebSocketService(IMemoryCache cache, NotificationService notificationService)
         {
             _cache = cache;
+            _notificationService = notificationService;
         }
 
         public async Task ConnectAsync(string uri)
@@ -78,6 +81,7 @@ namespace MAI.Models
                                 _cache.Set(IncidentIdsCacheKey, incidentIds);
                                 _cache.Set(incident.Id, incident, System.TimeSpan.FromMinutes(30)); 
                                 OnIncidentReceived?.Invoke(incident); 
+                                await _notificationService.ShowNotification(incident.Title, incident.ShortDescription); 
                             }
                         }
                     }

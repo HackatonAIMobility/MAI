@@ -9,6 +9,7 @@
 
     <main>
         <div class="top-row px-4">
+            <ThemeSwitcher/>
         </div>
 
         <article class="content px-4">
@@ -21,7 +22,7 @@
     protected override async Task OnInitializedAsync()
     {
         // TODO: Replace with your WebSocket server address
-        await WebSocketService.ConnectAsync("ws://localhost:8000/ws");
+        await WebSocketService.ConnectAsync("ws://10.110.168.15:8000/ws");
     }
 
     public async ValueTask DisposeAsync()

@@ -1,0 +1,155 @@
+@page "/incident-report"
+@using MAI.Models
+@using System.Text
+@using System.Net.Http.Headers
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject IMemoryCache MemoryCache
+@inject MAI.Services.ReportStateService ReportStateService
+
+<h1>Reportar Incidente</h1>
+
+<EditForm Model="@incident" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="title" class="form-label">Título</label>
+        <InputText id="title" class="form-control" @bind-Value="incident.Title" />
+        <ValidationMessage For="@(() => incident.Title)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="shortDescription" class="form-label">Descripción Corta</label>
+        <InputText id="shortDescription" class="form-control" @bind-Value="incident.ShortDescription" />
+        <ValidationMessage For="@(() => incident.ShortDescription)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Descripción</label>
+        <InputTextArea id="description" class="form-control" @bind-Value="incident.Description" />
+        <ValidationMessage For="@(() => incident.Description)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="startStation" class="form-label">Estación de Inicio</label>
+        <InputSelect id="startStation" class="form-select" @bind-Value="incident.StartStation">
+            <option value="">Seleccione una estación</option>
+            @foreach (var stationName in stationNames)
+            {
+                <option value="@stationName">@stationName</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => incident.StartStation)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="endStation" class="form-label">Estación de Fin</label>
+        <InputText id="endStation" class="form-control" @bind-Value="incident.EndStation" />
+        <ValidationMessage For="@(() => incident.EndStation)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="priority" class="form-label">Prioridad</label>
+        <InputSelect id="priority" class="form-select" @bind-Value="incident.Priority">
+            @foreach (var priorityValue in Enum.GetValues<MAI.Models.Priority>())
+            {
+                <option value="@priorityValue">@priorityValue.ToString()</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => incident.Priority)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Reportar</button>
+</EditForm>
+
+@code {
+    private Incident incident = new Incident();
+    private List<string> stationNames = new List<string>();
+    private string statusMessage;
+    private string statusMessageType; // "alert-success", "alert-danger"
+
+    // private const string ReportsCountCacheKey = "ReportsCount"; // Removed, now in ReportStateService
+    private const string LastReportTimestampCacheKey = "LastReportTimestamp";
+    private const int MinDelayMinutes = 5;
+
+    protected override void OnInitialized()
+    {
+        // incident.ShortDescription is now exposed in form
+        incident.Timestamp = DateTime.Now; // Set automatically
+        incident.Description = string.Empty; // Initializing to empty string
+        incident.EndStation = string.Empty; // Initializing to empty string
+
+        stationNames = MetroData.Stations.Keys.OrderBy(name => name).ToList();
+        
+        // Default priority
+        incident.Priority = MAI.Models.Priority.MEDIUM;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        statusMessage = string.Empty; // Clear previous messages
+
+        // Check delay
+        if (MemoryCache.TryGetValue(LastReportTimestampCacheKey, out DateTime lastReportTimestamp))
+        {
+            if (DateTime.Now.Subtract(lastReportTimestamp).TotalMinutes < MinDelayMinutes)
+            {
+                statusMessage = $"Debes esperar {MinDelayMinutes} minutos entre reportes. Intenta de nuevo en {Math.Ceiling(MinDelayMinutes - DateTime.Now.Subtract(lastReportTimestamp).TotalMinutes)} minutos.";
+                statusMessageType = "alert-danger";
+                return;
+            }
+        }
+
+        try
+        {
+            var json = System.Text.Json.JsonSerializer.Serialize(incident, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            });
+            var content = new StringContent(json, Encoding.UTF8, new MediaTypeHeaderValue("application/json"));
+
+            // TODO: Replace with your FastAPI endpoint for incidents
+            var response = await HttpClient.PostAsync("http://localhost:8000/incidents", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Update report count and timestamp using ReportStateService
+                ReportStateService.IncrementReportCount();
+                MemoryCache.Set(LastReportTimestampCacheKey, DateTime.Now);
+
+                statusMessage = "Incidente reportado con éxito!";
+                statusMessageType = "alert-success";
+
+                // Check for rewards
+                int freeEntrances = 0;
+                int currentReports = ReportStateService.ReportsCount; // Get updated count
+                if (currentReports == 5) freeEntrances = 1;
+                else if (currentReports == 25) freeEntrances = 3;
+                else if (currentReports == 100) freeEntrances = 10;
+
+                if (freeEntrances > 0)
+                {
+                    NavigationManager.NavigateTo($"/reward/{freeEntrances}");
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/incidents"); // Navigate back to incidents or a success page
+                }
+            }
+            else
+            {
+                // Handle error
+                statusMessage = $"Error al enviar el incidente: {response.StatusCode}";
+                statusMessageType = "alert-danger";
+                Console.WriteLine(await response.Content.ReadAsStringAsync());
+            }
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Excepción al enviar el incidente: {ex.Message}";
+            statusMessageType = "alert-danger";
+            Console.WriteLine($"Excepción al enviar el incidente: {ex.Message}");
+        }
+    }
+}
