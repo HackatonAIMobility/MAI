@@ -5,15 +5,31 @@ using System.Text.Json;
 
 namespace MAI.Services
 {
+    /// <summary>
+    /// Service responsible for handling incident reporting initiated from a widget.
+    /// It provides functionality to report travel incidents by automatically detecting location,
+    /// finding the nearest metro station, and submitting the incident to a backend service.
+    /// </summary>
     public class WidgetIncidentService
     {
         private readonly HttpClient _httpClient;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WidgetIncidentService"/> class.
+        /// </summary>
+        /// <param name="httpClient">The HTTP client used for making API requests.</param>
         public WidgetIncidentService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
+        /// <summary>
+        /// Reports a travel incident based on user input from a widget.
+        /// This method automatically retrieves the current location, determines the nearest metro station,
+        /// constructs an incident report, and submits it to the backend.
+        /// </summary>
+        /// <param name="isTravelSuccessful">A boolean indicating whether the reported travel was successful or not.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task ReportTravelIncident(bool isTravelSuccessful)
         {
             // 1. Get current location
@@ -49,6 +65,13 @@ namespace MAI.Services
             await SubmitIncident(incident);
         }
 
+        /// <summary>
+        /// Asynchronously retrieves the current geographical location of the device.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the asynchronous operation.
+        /// The task result contains a <see cref="Location"/> object if successful, otherwise <see langword="null"/>.
+        /// </returns>
         private async Task<Location?> GetCurrentLocation()
         {
             try
@@ -80,6 +103,11 @@ namespace MAI.Services
             return null;
         }
 
+        /// <summary>
+        /// Finds the nearest metro station to a given geographical location.
+        /// </summary>
+        /// <param name="currentLocation">The current <see cref="Location"/> from which to find the nearest station.</param>
+        /// <returns>The name of the nearest metro station as a <see cref="string"/>.</returns>
         private string FindNearestMetroStation(Location currentLocation)
         {
             string nearestStation = string.Empty;
@@ -103,6 +131,11 @@ namespace MAI.Services
             return nearestStation;
         }
 
+        /// <summary>
+        /// Asynchronously submits an <see cref="Incident"/> object to the backend service.
+        /// </summary>
+        /// <param name="incident">The <see cref="Incident"/> object to be submitted.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         private async Task SubmitIncident(Incident incident)
         {
             try

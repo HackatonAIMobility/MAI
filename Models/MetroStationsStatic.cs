@@ -1,8 +1,17 @@
 using MAI.Components.Layout;
 
 namespace MAI.Models;
+/// <summary>
+/// Provides static data for all metro stations, including their names and geographical coordinates.
+/// This data is used for various functionalities such as location-based services and route planning.
+/// </summary>
 public class MetroStationsStatic
 {
+    /// <summary>
+    /// A static list of all metro stations, represented as <see cref="OpenStreetMap.MapMarker"/> objects.
+    /// Each marker contains the station's title, latitude, and longitude.
+    /// The list is populated with data for the Mexico City Metro system, organized by line.
+    /// </summary>
     public static List<OpenStreetMap.MapMarker> MetroStations = new()
     {
         // --- LÍNEA 1 (Observatorio - Pantitlán) ---

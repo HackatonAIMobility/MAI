@@ -9,14 +9,32 @@ using Microsoft.Maui.Platform;
 
 namespace MAI.Platforms.Android
 {
+    /// <summary>
+    /// Implements an Android App Widget for fast incident reporting.
+    /// This widget allows users to quickly report whether their travel was successful or not
+    /// with a single tap, leveraging geolocation to identify the nearest metro station.
+    /// </summary>
     [BroadcastReceiver(Name = "com.equipoazul.mai.FastReportWidget", Label = "Fast Report", Exported = true)]
     [IntentFilter(new string[] { "android.appwidget.action.APPWIDGET_UPDATE", "com.equipoazul.mai.ACTION_REPORT_OK", "com.equipoazul.mai.ACTION_REPORT_NOT_OK" })]
     [MetaData("android.appwidget.provider", Resource = "@xml/fast_report_widget_info")]
     public class FastReportWidget : AppWidgetProvider
     {
+        /// <summary>
+        /// Action string for reporting a successful travel incident from the widget.
+        /// </summary>
         public const string ACTION_REPORT_OK = "com.equipoazul.mai.ACTION_REPORT_OK";
+        /// <summary>
+        /// Action string for reporting an unsuccessful travel incident from the widget.
+        /// </summary>
         public const string ACTION_REPORT_NOT_OK = "com.equipoazul.mai.ACTION_REPORT_NOT_OK";
 
+        /// <summary>
+        /// Called when the App Widget is to be updated.
+        /// This method is called to update the App Widget's UI and set up event handlers.
+        /// </summary>
+        /// <param name="context">The <see cref="Context"/> in which this receiver is running.</param>
+        /// <param name="appWidgetManager">The <see cref="AppWidgetManager"/> instance for the current App Widget provider.</param>
+        /// <param name="appWidgetIds">An array of IDs of the App Widgets to be updated.</param>
         public override void OnUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
         {
             // Perform this loop for each App Widget that belongs to this provider
@@ -26,6 +44,14 @@ namespace MAI.Platforms.Android
             }
         }
 
+        /// <summary>
+        /// Updates a single instance of the Fast Report widget.
+        /// This method sets up the layout and attaches pending intents to the buttons
+        /// for reporting successful or unsuccessful travel incidents.
+        /// </summary>
+        /// <param name="context">The <see cref="Context"/> in which this receiver is running.</param>
+        /// <param name="appWidgetManager">The <see cref="AppWidgetManager"/> instance for the current App Widget provider.</param>
+        /// <param name="appWidgetId">The ID of the specific App Widget instance to update.</param>
         public static void UpdateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId)
         {
             var views = new RemoteViews(context.PackageName, Resource.Layout.widget_fast_report);
@@ -48,6 +74,14 @@ namespace MAI.Platforms.Android
             appWidgetManager.UpdateAppWidget(appWidgetId, views);
         }
 
+        /// <summary>
+        /// Called when an <see cref="Intent"/> is sent to this <see cref="BroadcastReceiver"/>.
+        /// This method handles incoming intents, particularly those triggered by widget button clicks
+        /// for reporting incidents. It initializes the MAUI app services if necessary and
+        /// then delegates to <see cref="WidgetIncidentService"/> to report the incident.
+        /// </summary>
+        /// <param name="context">The <see cref="Context"/> in which this receiver is running.</param>
+        /// <param name="intent">The <see cref="Intent"/> being received.</param>
         public override async void OnReceive(Context context, Intent intent)
         {
             base.OnReceive(context, intent);

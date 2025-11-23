@@ -5,10 +5,15 @@ using Android.OS;
 using MAI.Services;
 using Android.Widget;
 using Android.Appwidget;
-using MAI.Platforms.Android; // Add this line
+using MAI.Platforms.Android;
 
 namespace MAI;
 
+/// <summary>
+/// Main activity for the Android platform, serving as the entry point for the MAI application.
+/// This activity handles the initial launch, theme application, and specific intents related to widgets,
+/// such as widget configuration and direct actions from widgets.
+/// </summary>
 [Activity(
     Name = "com.equipoazul.mai.MainActivity", 
     Theme = "@style/Maui.SplashTheme", 
@@ -17,6 +22,13 @@ namespace MAI;
     ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
 public class MainActivity : MauiAppCompatActivity
 {
+    /// <summary>
+    /// Called when the activity is first created.
+    /// This method sets up the activity, including handling widget configuration intents.
+    /// </summary>
+    /// <param name="savedInstanceState">If the activity is being re-initialized after
+    ///     previously being shut down then this Bundle contains the data it most recently
+    ///     supplied in <see cref="OnSaveInstanceState(Bundle)"/>.</param>
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
@@ -27,6 +39,12 @@ public class MainActivity : MauiAppCompatActivity
             HandleWidgetConfiguration(Intent);
         }
     }
+
+    /// <summary>
+    /// This method is called when the activity receives a new <see cref="Intent"/>.
+    /// It is used to process actions originating from the app widget, such as reporting incidents.
+    /// </summary>
+    /// <param name="intent">The new intent that was started for the activity.</param>
     protected override void OnNewIntent(Intent intent)
     {
         base.OnNewIntent(intent);
@@ -36,6 +54,13 @@ public class MainActivity : MauiAppCompatActivity
             HandleWidgetAction(intent);
         }
     }
+
+    /// <summary>
+    /// Handles the configuration process for an App Widget.
+    /// This method is invoked when a user adds an app widget to their home screen and
+    /// the widget requires configuration. It sets the result for the widget ID.
+    /// </summary>
+    /// <param name="intent">The intent that triggered the widget configuration, containing the App Widget ID.</param>
     private void HandleWidgetConfiguration(Intent intent)
     {
         // 1. Get the App Widget ID this configuration is for
@@ -63,6 +88,13 @@ public class MainActivity : MauiAppCompatActivity
             Finish();
         }
     }
+
+    /// <summary>
+    /// Handles actions initiated from the app widget, specifically incident reporting.
+    /// It retrieves the widget action, determines the success status of travel, and submits
+    /// an incident report using the <see cref="WidgetIncidentService"/>.
+    /// </summary>
+    /// <param name="intent">The intent containing the widget action extra.</param>
     private async void HandleWidgetAction(Intent intent)
     {
         var widgetIncidentService = MauiApplication.Current.Services.GetService<WidgetIncidentService>();
