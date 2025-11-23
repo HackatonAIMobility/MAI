@@ -1,0 +1,168 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+@namespace MAI.Components.Layout
+
+<div id="@mapId" style="height: @Height; width: @Width;"></div>
+
+@code {
+    [Parameter]
+    public string Height { get; set; } = "400px !important";
+
+    [Parameter]
+    public string Width { get; set; } = "100% !important";
+
+    [Parameter]
+    public double CenterLatitude { get; set; }
+
+    [Parameter]
+    public double CenterLongitude { get; set; }
+
+    [Parameter]
+    public int Zoom { get; set; } = 13;
+
+    [Parameter]
+    public List<MapMarker> Markers { get; set; } = new();
+    [Parameter]
+    public EventCallback<MapMarker> OnMapClick { get; set; }
+
+    [Parameter]
+    public EventCallback<MapMarker> OnMarkerClick { get; set; }
+
+    private string mapId = $"map_{Guid.NewGuid():N}";
+    private IJSObjectReference module = default!;
+    private DotNetObjectReference<OpenStreetMap> objRef = default!;
+
+    public class MapMarker
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString("N");
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public string Title { get; set; } = string.Empty;
+
+        public string IconSvg { get; set; } = string.Empty;
+        public int[] IconSize { get; set; } = new[] { 32, 32 };
+        public int[] IconAnchor { get; set; } = new[] { 16, 32 };
+    }
+
+    public async Task RefreshMap()
+    {
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("refreshMap", mapId);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/maps.js");
+            objRef = DotNetObjectReference.Create(this);
+
+            var options = new
+            {
+                mapId,
+                center = new { lat = CenterLatitude, lng = CenterLongitude },
+                zoom = Zoom,
+                markers = Markers
+            };
+
+            await module.InvokeVoidAsync("initializeMap", options, objRef);
+        }
+    }
+
+    public async Task SetCenter(double latitude, double longitude, int? zoom = null)
+    {
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("setMapCenter", mapId, latitude, longitude, zoom ?? Zoom);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnMapClickFromJS(double latitude, double longitude)
+    {
+        var marker = new MapMarker
+        {
+            Latitude = latitude,
+            Longitude = longitude,
+            Title = $"New Marker"
+        };
+        await OnMapClick.InvokeAsync(marker);
+    }
+    public async Task AddMarker(MapMarker marker)
+    {
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("addMarker", mapId, marker);
+        }
+    }
+
+    public async Task AddMarkers(List<MapMarker> markers)
+    {
+        if (module != null)
+        {
+            foreach (var marker in markers)
+            {
+                await AddMarker(marker);
+            }
+        }
+    }
+
+    public async Task RemoveMarker(string markerId)
+    {
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("removeMarker", mapId, markerId);
+        }
+    }
+
+    public async Task ClearMarkers()
+    {
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("clearMarkers", mapId);
+        }
+    }
+
+    public async Task UpdateMarker(MapMarker marker)
+    {
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("updateMarker", mapId, marker);
+        }
+    }
+
+    public async Task DrawRoute(List<MapMarker> route)
+    {
+        if (module != null)
+        {
+            var coordinates = route.Select(marker => new { lat = marker.Latitude, lng = marker.Longitude }).ToList();
+            await module.InvokeVoidAsync("drawPolyline", mapId, coordinates);
+        }
+    }
+
+    public async Task ClearPolylines()
+    {
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("clearPolylines", mapId);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnMarkerClickedFromJS(MapMarker marker)
+    {
+        await OnMarkerClick.InvokeAsync(marker);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module != null)
+        {
+            await module.DisposeAsync();
+        }
+        objRef?.Dispose();
+    }
+}

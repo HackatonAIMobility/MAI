@@ -1,0 +1,143 @@
+@if (route != null && route.Any())
+{
+    <div class="mt-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white">
+                <button class="accordion-button-custom w-100 bg-transparent border-0 text-white d-flex align-items-center justify-content-between p-0" 
+                        type="button" 
+                        @onclick="ToggleRouteDetails">
+                    <div class="d-flex align-items-center">
+                        <Icon Name="IconName.SignpostSplit" class="me-2"/>
+                        <strong>Ruta Encontrada</strong>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge bg-light text-success">@route.Count estaciones</span>
+                        <Icon Name="@(showRouteDetails ? IconName.ChevronUp : IconName.ChevronDown)"/>
+                    </div>
+                </button>
+            </div>
+            
+            @if (showRouteDetails)
+            {
+                <div class="card-body p-4 animate-slide-down">
+                    <!-- Visual Route Timeline -->
+                    <div class="route-timeline">
+                        @for (int i = 0; i < route.Count; i++)
+                        {
+                            var station = route[i];
+                            var isFirst = i == 0;
+                            var isLast = i == route.Count - 1;
+                            int incidentsInStation = GetIncidentsByStation(station.Name);
+
+                            <div class="timeline-item @(isFirst ? "first" : "") @(isLast ? "last" : "")">
+                                <div class="timeline-marker">
+                                    @if (isFirst)
+                                    {
+                                        <Icon Name="IconName.GeoAltFill" class="text-success"/>
+                                    }
+                                    else if (isLast)
+                                    {
+                                        <Icon Name="IconName.FlagFill" class="text-danger"/>
+                                    }
+                                    else
+                                    {
+                                        <div class="station-dot"></div>
+                                    }
+                                </div>
+                                <div class="timeline-content" @onclick="async () => await ShowIncidentsModalAsync(station.Name)">
+                                    <div class="station-card @(isFirst ? "border-success" : "") @(isLast ? "border-danger" : "") @(incidentsInStation > 0 ? "border-warning" : "")">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <strong>@station.Name</strong>
+                                                @if (isFirst)
+                                                {
+                                                    <span class="badge bg-success-subtle text-success ms-2">Inicio</span>
+                                                }
+                                                else if (isLast)
+                                                {
+                                                    <span class="badge bg-danger-subtle text-danger ms-2">Destino</span>
+                                                }
+                                            </div>
+                                            <small class="text-muted">Estación @(i + 1)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            @if (!isLast)
+                            {
+                                <div class="timeline-connector"></div>
+                            }
+                        }
+                    </div>
+                    
+                    <!-- Summary Info -->
+                    <div class="row mt-4 pt-3 border-top">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <Icon Name="IconName.ListOl" class="text-primary mb-2" style="font-size: 1.5rem;"/>
+                                <div class="fw-bold">@route.Count</div>
+                                <small class="text-muted">Estaciones</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <Icon Name="IconName.ArrowRightCircle" class="text-info mb-2" style="font-size: 1.5rem;"/>
+                                <div class="fw-bold">@(route.Count - 1)</div>
+                                <small class="text-muted">Transbordos</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <Icon Name="IconName.ClockHistory" class="text-warning mb-2" style="font-size: 1.5rem;"/>
+                                <div class="fw-bold">~@((route.Count - 1) * 2) min</div>
+                                <small class="text-muted">Tiempo estimado</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Collapsed Summary -->
+                <div class="card-body py-2 px-4 bg-light animate-slide-down">
+                    <div class="d-flex align-items-center justify-content-between text-muted small">
+                        <span>
+                            <Icon Name="IconName.GeoAltFill" class="text-success me-1"/>
+                            <strong>@route.First().Name</strong>
+                        </span>
+                        <Icon Name="IconName.ArrowRight" class="mx-2"/>
+                        <span>@(route.Count - 2) estaciones</span>
+                        <Icon Name="IconName.ArrowRight" class="mx-2"/>
+                        <span>
+                            <Icon Name="IconName.FlagFill" class="text-danger me-1"/>
+                            <strong>@route.Last().Name</strong>
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+<Modal @ref=_incidentsModal Size=ModalSize.ExtraLarge IsScrollable=true/> 
+@code {
+    [Parameter]
+    public List<Station> route { get; set; } = new();
+    [Parameter]
+    public List<Incident> Incidents { get; set; } = new();
+    private bool showRouteDetails = true;
+    private Modal _incidentsModal = new();
+    private void ToggleRouteDetails()
+    {
+        showRouteDetails = !showRouteDetails;
+    }
+    private int GetIncidentsByStation(string station)
+        => Incidents.Count(p => p.StartStation == station || p.EndStation == station);
+    private async Task ShowIncidentsModalAsync(string station){
+        var aux = Incidents.Where(p => p.StartStation == station || p.EndStation == station).ToList();
+        Dictionary<string, object> parameters = new(){
+            {"incidents", aux }
+        };
+        await _incidentsModal.ShowAsync<IncidentsModal>($"Incidentes en: {station}", null, parameters);
+    }
+}

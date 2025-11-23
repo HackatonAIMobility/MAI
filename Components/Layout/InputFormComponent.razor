@@ -1,0 +1,58 @@
+<form class="row my-3">
+    <h2>@Title</h2>
+    <div class="d-grid gap-2">
+        <div class="btn-group">
+            <Button
+                Color="ButtonColor.Success"
+                Outline=true
+                Size="ButtonSize.ExtraLarge"
+                TooltipTitle="Reportar si"  
+                Type="ButtonType.Button"
+            >
+                Si <Icon Name="IconName.Check"/>
+            </Button>
+            <Button
+                Color="ButtonColor.Danger"
+                Outline=true
+                Size="ButtonSize.ExtraLarge"
+                TooltipTitle="Reportar no"  
+                Type="ButtonType.Button"
+            >
+                No <Icon Name="IconName.X"/>
+            </Button>
+        </div>
+    </div>
+    <div class="form-floating">
+        <textarea class="form-control" placeholder="Deja un comentario sobre tu experiencia (opcional)" id="TextAreaInput-@Name"  @bind="_comment"></textarea>
+        <label for="TextAreaInput-@Name">Comentarios</label>
+    </div>
+    <div class="d-grid gap-2">
+        <Button
+            Color="ButtonColor.Danger"
+            Outline=true
+            Size="ButtonSize.ExtraLarge"
+            TooltipTitle="Cargar reporte"  
+            Type="ButtonType.Button"
+        >
+            Cargar información <Icon Name="IconName.Floppy"/>
+        </Button>
+    </div>
+</form>
+@code{
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+    [Parameter]
+    public string Name { get; set; } = string.Empty;
+    [Parameter]
+    public EventCallback<Report> OnReportSubmited { get; set; } = new();
+    private string _comment = string.Empty;
+    private bool _success = false;
+    private async Task OnFormSubmited(){
+        Report report = new(){
+            Success = _success,
+            Comment = _comment,
+            FormTitle = Title,
+            Timestamp = DateTime.UtcNow
+        };
+    }
+}

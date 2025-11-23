@@ -1,0 +1,16 @@
+@page "/reports"
+
+<InputFormComponent 
+    Title="¿El tiempo de llegada fue adecuado?"
+    OnReportSubmited="OnArrivalTimeForm"
+/>
+<InputFormComponent 
+    Title="¿El viaje fue satisfactorio?"
+    OnReportSubmited="OnArrivalTimeForm"
+/>
+
+@code{
+    private async Task OnArrivalTimeForm(Report report){
+
+    }
+}

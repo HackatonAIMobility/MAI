@@ -1,0 +1,29 @@
+﻿@page "/"
+
+<h1>Sistema de reportes del metro</h1>
+<RoutePlanner @ref=_routePlanner Incidents="_incidents.GetIncidents()" OnRouteSet="OnRouteSet"/>
+<Accordion Class="my-3">
+    <AccordionItem>
+        <TitleTemplate>
+            <Icon Name="IconName.ExclamationDiamond" Class="me-1" /> Avisos de incidentes
+        </TitleTemplate>
+        <Content>
+            <Incidents @ref="_incidents"/>
+        </Content>
+    </AccordionItem>
+</Accordion>
+
+@code{
+    private OpenStreetMap _map = new();
+    private RoutePlanner _routePlanner = new();
+    private Incidents _incidents = new();
+    private static List<OpenStreetMap.MapMarker> metroStations = MetroStations;
+    protected override async Task OnInitializedAsync(){
+        await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+        await Permissions.RequestAsync<Permissions.LocationAlways>();
+        await Permissions.RequestAsync<Permissions.PostNotifications>();
+    }
+    private async Task OnRouteSet(List<string> route){
+        _incidents.UpdateNotificationsToRoute(route);
+    }
+}

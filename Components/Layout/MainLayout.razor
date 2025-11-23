@@ -1,0 +1,31 @@
+﻿@inherits LayoutComponentBase
+@inject MAI.Models.WebSocketService WebSocketService
+@implements IAsyncDisposable
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // TODO: Replace with your WebSocket server address
+        await WebSocketService.ConnectAsync("ws://localhost:8000/ws");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await WebSocketService.DisconnectAsync();
+    }
+}

@@ -1,0 +1,81 @@
+@page "/route-planner"
+@using MAI.Models
+@inject MetroService metroService
+
+<div class="row my-3">
+    <div class="col-6">
+        <div class="form-floating">
+            <select class="form-select" id="floatingSelectStartStation" aria-label="Estación de inicio" @bind="startStationName">
+                @foreach (var stationName in stationNames)
+                {
+                    <option value="@stationName">@stationName</option>
+                }
+            </select>
+            <label for="floatingSelectStartStation">Estación de Inicio</label>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-floating">
+            <select class="form-select" id="floatingSelect" aria-label="Estación final" @bind="endStationName">
+                @foreach (var stationName in stationNames.Where(p => p != startStationName))
+                {
+                    <option value="@stationName">@stationName</option>
+                }
+            </select>
+            <label for="floatingSelect">Estación destino</label>
+        </div>
+    </div>
+</div>
+
+<div class="my-3 d-grid gap-2">
+    <Button
+        Color="ButtonColor.Success"
+        Outline=true
+        TooltipTitle="Encontrar Ruta"
+        Type="ButtonType.Button"
+        @onclick="FindRoute"
+    >
+        Encontrar Ruta <Icon Name="IconName.Map"/>
+    </Button>
+</div>
+
+<RouteResume route="route" Incidents=Incidents @ref="routeResume"/>
+
+<div class="my-3">
+    <OpenStreetMap @ref="map" CenterLatitude="19.4326" CenterLongitude="-99.1332" Zoom="11" />
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<List<string>> OnRouteSet { get; set; }
+    [Parameter]
+    public List<Incident> Incidents { get; set; } = new();
+    private string startStationName = string.Empty;
+    private string endStationName = string.Empty;
+    private List<Station> route = new();
+    private OpenStreetMap map = new();
+    private RouteResume routeResume = new();
+    private List<string> stationNames = new List<string>();
+
+    protected override void OnInitialized()
+    {
+        stationNames = MetroData.Stations.Keys.OrderBy(name => name).ToList();
+    }
+
+    private async Task FindRoute()
+    {
+        if (!string.IsNullOrEmpty(startStationName) && !string.IsNullOrEmpty(endStationName))
+        {
+            route = metroService.FindRoute(startStationName, endStationName);
+            if (route != null)
+            {
+                var markers = route.Select(s => new OpenStreetMap.MapMarker { Title = s.Name, Latitude = s.Latitude, Longitude = s.Longitude }).ToList();
+                await map.ClearMarkers();
+                await map.ClearPolylines();
+                await map.AddMarkers(markers);
+                await map.DrawRoute(markers);
+                await OnRouteSet.InvokeAsync(route.Select(p => p.Name).ToList());
+            }
+        }
+    }
+}

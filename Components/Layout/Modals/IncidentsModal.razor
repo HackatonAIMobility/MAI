@@ -1,0 +1,256 @@
+@if (incidents != null && incidents.Any())
+{
+    <div class="mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h4 class="mb-0">
+                <Icon Name="IconName.ExclamationTriangleFill" class="me-2 text-warning"/>
+                Incidentes Activos
+            </h4>
+            <span class="badge bg-secondary">@incidents.Count incidente(s)</span>
+        </div>
+
+        <div class="incidents-list">
+            @foreach (var incident in incidents.OrderByDescending(i => i.Timestamp))
+            {
+                <div class="mb-3">
+                    <div class="card shadow-sm border-0 incident-card">
+                        <div class="card-header @GetPriorityHeaderClass(incident.Priority) text-white">
+                            <button class="accordion-button-custom w-100 bg-transparent border-0 text-white d-flex align-items-center justify-content-between p-0" 
+                                    type="button" 
+                                    @onclick="() => ToggleIncident(incident.Id)">
+                                <div class="d-flex align-items-center gap-2 flex-grow-1 text-truncate">
+                                    <Icon Name="@GetPriorityIcon(incident.Priority)" class="flex-shrink-0"/>
+                                    <strong class="text-truncate">@incident.Title</strong>
+                                </div>
+                                <div class="d-flex align-items-center gap-3 flex-shrink-0">
+                                    <span class="badge bg-light @GetPriorityTextClass(incident.Priority) d-none d-md-inline">
+                                        @incident.Priority
+                                    </span>
+                                    <small class="d-none d-sm-inline text-white opacity-75">
+                                        @GetTimeAgo(incident.Timestamp)
+                                    </small>
+                                    <Icon Name="@(IsIncidentExpanded(incident.Id) ? IconName.ChevronUp : IconName.ChevronDown)"/>
+                                </div>
+                            </button>
+                        </div>
+                        
+                        @if (IsIncidentExpanded(incident.Id))
+                        {
+                            <div class="card-body p-4 animate-slide-down">
+                                <!-- Short Description -->
+                                <div class="alert @GetPriorityAlertClass(incident.Priority) d-flex align-items-start mb-3" role="alert">
+                                    <Icon Name="IconName.InfoCircleFill" class="me-2 mt-1 flex-shrink-0"/>
+                                    <div class="flex-grow-1">
+                                        <strong class="d-block mb-1">Resumen</strong>
+                                        @incident.ShortDescription
+                                    </div>
+                                </div>
+
+                                <!-- Full Description -->
+                                @if (!string.IsNullOrEmpty(incident.Description))
+                                {
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-2">
+                                            <Icon Name="IconName.FileText" class="me-1"/>
+                                            Descripción Detallada
+                                        </h6>
+                                        <p class="text-secondary mb-0">@incident.Description</p>
+                                    </div>
+                                }
+
+                                <!-- Affected Stations -->
+                                @if (!string.IsNullOrEmpty(incident.StartStation) || !string.IsNullOrEmpty(incident.EndStation))
+                                {
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-2">
+                                            <Icon Name="IconName.GeoAlt" class="me-1"/>
+                                            Estaciones Afectadas
+                                        </h6>
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            @if (!string.IsNullOrEmpty(incident.StartStation))
+                                            {
+                                                <div class="station-badge">
+                                                    <Icon Name="IconName.RecordCircleFill" class="text-primary me-1"/>
+                                                    <strong>Inicio:</strong> @incident.StartStation
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(incident.EndStation))
+                                            {
+                                                <div class="station-badge">
+                                                    <Icon Name="IconName.RecordCircleFill" class="text-danger me-1"/>
+                                                    <strong>Fin:</strong> @incident.EndStation
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- Metadata Footer -->
+                                <div class="row pt-3 border-top">
+                                    <div class="col-sm-6 col-md-3 mb-2 mb-md-0">
+                                        <div class="d-flex align-items-center text-muted small">
+                                            <Icon Name="IconName.Calendar3" class="me-2"/>
+                                            <div>
+                                                <small class="d-block opacity-75">Fecha</small>
+                                                <strong class="text-dark">@incident.Timestamp.ToLocalTime().ToString("dd/MM/yyyy")</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3 mb-2 mb-md-0">
+                                        <div class="d-flex align-items-center text-muted small">
+                                            <Icon Name="IconName.Clock" class="me-2"/>
+                                            <div>
+                                                <small class="d-block opacity-75">Hora</small>
+                                                <strong class="text-dark">@incident.Timestamp.ToLocalTime().ToString("HH:mm:ss")</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3 mb-2 mb-md-0">
+                                        <div class="d-flex align-items-center text-muted small">
+                                            <Icon Name="IconName.Hash" class="me-2"/>
+                                            <div>
+                                                <small class="d-block opacity-75">ID</small>
+                                                <strong class="text-dark text-truncate d-inline-block" style="max-width: 100px;" title="@incident.Id">
+                                                    @incident.Id.Substring(0, Math.Min(8, incident.Id.Length))
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="d-flex align-items-center text-muted small">
+                                            <Icon Name="@GetPriorityIcon(incident.Priority)" class="me-2"/>
+                                            <div>
+                                                <small class="d-block opacity-75">Prioridad</small>
+                                                <strong class="text-dark">@incident.Priority</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Collapsed Summary -->
+                            <div class="card-body py-2 px-4 bg-light animate-slide-down">
+                                <div class="d-flex align-items-center justify-content-between text-muted small">
+                                    <span class="text-truncate flex-grow-1 me-3">
+                                        <Icon Name="IconName.FileText" class="me-1"/>
+                                        @incident.ShortDescription
+                                    </span>
+                                    <div class="d-flex align-items-center gap-3 flex-shrink-0">
+                                        @if (!string.IsNullOrEmpty(incident.StartStation))
+                                        {
+                                            <span class="text-nowrap d-none d-lg-inline">
+                                                <Icon Name="IconName.GeoAlt" class="me-1"/>
+                                                @incident.StartStation
+                                            </span>
+                                        }
+                                        <span class="text-nowrap">
+                                            <Icon Name="IconName.Clock" class="me-1"/>
+                                            @incident.Timestamp.ToLocalTime().ToString("HH:mm")
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else if (incidents != null)
+{
+    <div class="alert alert-info mt-4" role="alert">
+        <Icon Name="IconName.InfoCircle" class="me-2"/>
+        No hay incidentes registrados en este momento.
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<Incident>? incidents { get; set; }
+
+    private HashSet<string> expandedIncidents = new HashSet<string>();
+
+    private void ToggleIncident(string incidentId)
+    {
+        if (expandedIncidents.Contains(incidentId))
+        {
+            expandedIncidents.Remove(incidentId);
+        }
+        else
+        {
+            expandedIncidents.Add(incidentId);
+        }
+    }
+
+    private bool IsIncidentExpanded(string incidentId)
+    {
+        return expandedIncidents.Contains(incidentId);
+    }
+
+    private string GetTimeAgo(DateTime timestamp)
+    {
+        var timeSpan = DateTime.UtcNow - timestamp;
+        
+        if (timeSpan.TotalMinutes < 1)
+            return "Ahora";
+        if (timeSpan.TotalMinutes < 60)
+            return $"Hace {(int)timeSpan.TotalMinutes}m";
+        if (timeSpan.TotalHours < 24)
+            return $"Hace {(int)timeSpan.TotalHours}h";
+        if (timeSpan.TotalDays < 7)
+            return $"Hace {(int)timeSpan.TotalDays}d";
+        
+        return timestamp.ToLocalTime().ToString("dd/MM/yyyy");
+    }
+
+    private string GetPriorityHeaderClass(Models.Priority priority)
+    {
+        return priority switch
+        {
+            Models.Priority.HIGH => "bg-danger",
+            Models.Priority.MEDIUM => "bg-warning",
+            Models.Priority.LOW => "bg-info",
+            Models.Priority.MESSAGE => "bg-primary",
+            _ => "bg-secondary"
+        };
+    }
+
+    private string GetPriorityTextClass(Models.Priority priority)
+    {
+        return priority switch
+        {
+            Models.Priority.HIGH => "text-danger",
+            Models.Priority.MEDIUM => "text-warning",
+            Models.Priority.LOW => "text-info",
+            Models.Priority.MESSAGE => "text-primary",
+            _ => "text-secondary"
+        };
+    }
+
+    private string GetPriorityAlertClass(Models.Priority priority)
+    {
+        return priority switch
+        {
+            Models.Priority.HIGH => "alert-danger",
+            Models.Priority.MEDIUM => "alert-warning",
+            Models.Priority.LOW => "alert-info",
+            Models.Priority.MESSAGE => "alert-primary",
+            _ => "alert-secondary"
+        };
+    }
+
+    private IconName GetPriorityIcon(Models.Priority priority)
+    {
+        return priority switch
+        {
+            Models.Priority.HIGH => IconName.ExclamationTriangleFill,
+            Models.Priority.MEDIUM => IconName.ExclamationCircleFill,
+            Models.Priority.LOW => IconName.InfoCircleFill,
+            Models.Priority.MESSAGE => IconName.EnvelopeFill,
+            _ => IconName.InfoCircle
+        };
+    }
+}

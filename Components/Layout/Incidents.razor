@@ -1,0 +1,113 @@
+@page "/incidents"
+@using MAI.Models
+@inject WebSocketService webSocketService
+@implements IDisposable
+
+<div class="row my-3">
+    <div class="d-grid gap-2">
+        <div class="btn-group">
+            <Button
+                Outline=true
+                Color=ButtonColor.Success
+                TooltipTitle="Filtrar por prioridad baja"  
+                Type="ButtonType.Button"
+                @onclick="() => FilterIncidents(Models.Priority.LOW)"
+            >
+                <Icon Name="IconName.EmojiSmile"/>
+            </Button>
+            <Button
+                Outline=true
+                Color=ButtonColor.Warning
+                TooltipTitle="Filtrar por prioridad media"  
+                Type="ButtonType.Button"
+                @onclick="() => FilterIncidents(Models.Priority.MEDIUM)"
+            >
+                <Icon Name="IconName.ExclamationDiamond"/>
+            </Button>
+            <Button
+                Outline=true
+                Color=ButtonColor.Danger
+                TooltipTitle="Filtrar por prioridad alta"  
+                Type="ButtonType.Button"
+                @onclick="() => FilterIncidents(Models.Priority.HIGH)"
+            >
+                <Icon Name="IconName.ExclamationOctagon"/>
+            </Button>
+            <Button
+                Outline=true
+                Color=ButtonColor.Info
+                TooltipTitle="Limpiar filtro" 
+                Type="ButtonType.Button"
+                @onclick="() => FilterIncidents(null)"
+            >
+                <Icon Name="IconName.Trash"/>
+            </Button>
+        </div>
+    </div>
+</div>
+<div class="row my-3">
+    @foreach(var incident in _incidents){
+        string color = incident.Priority == Models.Priority.MESSAGE ? "info" : 
+                            incident.Priority == Models.Priority.LOW ? "success" : 
+                            incident.Priority == Models.Priority.MEDIUM ? "warning" : "danger";
+        
+        <div class="card border-@color mb-3 my-1">
+            <div class="card-body text-@color">
+                <h5 class="card-title">@incident.Title</h5>
+                <h6 class="card-subtitle mb-2 text-body-@color">@incident.ShortDescription</h6>
+                @if(String.IsNullOrEmpty(incident.EndStation)){
+                        <p class="card-text">Estación afectada: @incident.StartStation</p>
+                    }else{
+                        <p class="card-text">Estaciones afectadas: @incident.StartStation - @incident.EndStation</p>
+                    }
+                <figure>
+                    <figcaption class="blockquote-footer text-@color">
+                        Fecha: @incident.Timestamp.ToString()
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    }
+</div>
+<Modal @ref="_indicentModal"/>
+@code{
+    private List<Incident> _allIncidents = new();
+    private List<Incident> _incidents = new();
+    private Modal _indicentModal = new();
+
+    protected override void OnInitialized()
+    {
+        _allIncidents = webSocketService.GetAllIncidents();
+        FilterIncidentsByDate();
+        webSocketService.OnIncidentReceived += HandleIncidentReceived;
+    }
+
+    private void HandleIncidentReceived(Incident incident)
+    {
+        _allIncidents.Add(incident);
+        FilterIncidentsByDate();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void FilterIncidentsByDate() => _incidents = _allIncidents.OrderByDescending(i => i.Timestamp).ToList();
+
+    private void FilterIncidents(Models.Priority? priority)
+    {
+        if(priority != null)
+            _incidents = _allIncidents.Where(i => i.Priority == priority).OrderByDescending(i => i.Timestamp).ToList();
+        else
+            FilterIncidentsByDate();
+        StateHasChanged();
+    }
+    
+    public void Dispose()
+    {
+        webSocketService.OnIncidentReceived -= HandleIncidentReceived;
+    }
+
+    public List<Incident> GetIncidents() => _incidents;
+    public void UpdateNotificationsToRoute(List<string> route){
+        _incidents = _allIncidents.Where(p => route.Contains(p.StartStation) || route.Contains(p.EndStation)).OrderByDescending(i => i.Timestamp).ToList();
+        StateHasChanged();
+    }
+}
