@@ -25,6 +25,7 @@ public static class MauiProgram
         builder.Services.AddMemoryCache();
         builder.Services.AddSingleton<WebSocketService>();
         builder.Services.AddSingleton<NotificationService>();
+        builder.Services.AddSingleton<ReportStateService>();
         builder.Services.AddHttpClient();
 
 #if DEBUG

@@ -1,0 +1,64 @@
+@page "/reward/{FreeEntrances:int}"
+@page "/reports-summary"
+@using QRCoder; 
+@using System.IO; 
+@inject NavigationManager NavigationManager 
+
+<PageTitle>¡Recompensa Obtenida!</PageTitle>
+
+<h1>¡Felicidades!</h1>
+<p>Has obtenido <b>@FreeEntrances</b> entradas gratis para el Metro.</p>
+
+<div class="text-center mt-4">
+    @if (!string.IsNullOrEmpty(qrCodeImageBase64))
+    {
+        <img src="data:image/png;base64,@qrCodeImageBase64" alt="QR Code" style="width: 250px; height: 250px;" />
+        <p class="mt-2">Presenta este código QR para reclamar tus entradas.</p>
+    }
+    else
+    {
+        <p>Generando código QR...</p>
+    }
+</div>
+
+<div class="mt-4">
+    <button class="btn btn-primary" @onclick="GoToIncidents">Volver a Incidentes</button>
+</div>
+
+@code {
+    [Parameter]
+    public int FreeEntrances { get; set; }
+
+    private string qrCodeImageBase64 = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        GenerateQrCode();
+    }
+
+    private void GenerateQrCode()
+    {
+        // For simplicity, the QR code content is just the number of free entrances.
+        // In a real application, this would be a secure token or a link to a redemption page.
+        string qrContent = $"Entradas de Metro: {FreeEntrances}";
+
+        // Adjust pixel size as needed
+        using (QRCodeGenerator qrGenerator = new QRCodeGenerator())
+        {
+            using (QRCodeData qrCodeData = qrGenerator.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q))
+            {
+                using (PngByteQRCode qrCode = new PngByteQRCode(qrCodeData))
+                {
+                    // Corrected line: GetGraphic method directly returns byte[]
+                    byte[] qrCodeBytes = qrCode.GetGraphic(20); 
+                    qrCodeImageBase64 = Convert.ToBase64String(qrCodeBytes);
+                }
+            }
+        }
+    }
+
+    private void GoToIncidents()
+    {
+        NavigationManager.NavigateTo("/incidents");
+    }
+}

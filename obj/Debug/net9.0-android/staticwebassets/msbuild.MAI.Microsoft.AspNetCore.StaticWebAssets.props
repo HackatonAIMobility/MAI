@@ -117,7 +117,7 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <FileLength>5382</FileLength>
-      <LastWriteTime>Sun, 23 Nov 2025 01:51:36 GMT</LastWriteTime>
+      <LastWriteTime>Sun, 23 Nov 2025 10:22:16 GMT</LastWriteTime>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\MAI.styles.css'))</OriginalItemSpec>
     </StaticWebAsset>
   </ItemGroup>

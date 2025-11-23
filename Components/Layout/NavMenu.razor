@@ -28,5 +28,33 @@
                 <Icon Name="IconName.Flag"/> Reportar Incidente
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/reports-summary" Match="NavLinkMatch.All">
+                <Icon Name="IconName.List"/> Reportes Hechos: @ReportStateService.ReportsCount
+            </NavLink>
+        </div>
     </div>
 </div>
+
+@inject MAI.Services.ReportStateService ReportStateService
+@implements IDisposable
+
+@code {
+    protected override void OnInitialized()
+    {
+        ReportStateService.PropertyChanged += OnReportsCountChanged;
+    }
+
+    private void OnReportsCountChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ReportStateService.ReportsCount))
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        ReportStateService.PropertyChanged -= OnReportsCountChanged;
+    }
+}

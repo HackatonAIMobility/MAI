@@ -4,6 +4,8 @@
 @using System.Net.Http.Headers
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
+@inject IMemoryCache MemoryCache
+@inject MAI.Services.ReportStateService ReportStateService
 
 <h1>Reportar Incidente</h1>
 
@@ -12,8 +14,21 @@
     <ValidationSummary />
 
     <div class="mb-3">
-        <label for="title" class="form-label">Título (Opcional)</label>
+        <label for="title" class="form-label">Título</label>
         <InputText id="title" class="form-control" @bind-Value="incident.Title" />
+        <ValidationMessage For="@(() => incident.Title)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="shortDescription" class="form-label">Descripción Corta</label>
+        <InputText id="shortDescription" class="form-control" @bind-Value="incident.ShortDescription" />
+        <ValidationMessage For="@(() => incident.ShortDescription)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Descripción</label>
+        <InputTextArea id="description" class="form-control" @bind-Value="incident.Description" />
+        <ValidationMessage For="@(() => incident.Description)" />
     </div>
 
     <div class="mb-3">
@@ -29,8 +44,9 @@
     </div>
 
     <div class="mb-3">
-        <label for="endStation" class="form-label">Estación de Fin (Opcional)</label>
+        <label for="endStation" class="form-label">Estación de Fin</label>
         <InputText id="endStation" class="form-control" @bind-Value="incident.EndStation" />
+        <ValidationMessage For="@(() => incident.EndStation)" />
     </div>
 
     <div class="mb-3">
@@ -50,11 +66,19 @@
 @code {
     private Incident incident = new Incident();
     private List<string> stationNames = new List<string>();
+    private string statusMessage;
+    private string statusMessageType; // "alert-success", "alert-danger"
+
+    // private const string ReportsCountCacheKey = "ReportsCount"; // Removed, now in ReportStateService
+    private const string LastReportTimestampCacheKey = "LastReportTimestamp";
+    private const int MinDelayMinutes = 5;
 
     protected override void OnInitialized()
     {
-        incident.ShortDescription = string.Empty; // Not exposed in form
+        // incident.ShortDescription is now exposed in form
         incident.Timestamp = DateTime.Now; // Set automatically
+        incident.Description = string.Empty; // Initializing to empty string
+        incident.EndStation = string.Empty; // Initializing to empty string
 
         stationNames = MetroData.Stations.Keys.OrderBy(name => name).ToList();
         
@@ -64,9 +88,25 @@
 
     private async Task HandleValidSubmit()
     {
+        statusMessage = string.Empty; // Clear previous messages
+
+        // Check delay
+        if (MemoryCache.TryGetValue(LastReportTimestampCacheKey, out DateTime lastReportTimestamp))
+        {
+            if (DateTime.Now.Subtract(lastReportTimestamp).TotalMinutes < MinDelayMinutes)
+            {
+                statusMessage = $"Debes esperar {MinDelayMinutes} minutos entre reportes. Intenta de nuevo en {Math.Ceiling(MinDelayMinutes - DateTime.Now.Subtract(lastReportTimestamp).TotalMinutes)} minutos.";
+                statusMessageType = "alert-danger";
+                return;
+            }
+        }
+
         try
         {
-            var json = System.Text.Json.JsonSerializer.Serialize(incident);
+            var json = System.Text.Json.JsonSerializer.Serialize(incident, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            });
             var content = new StringContent(json, Encoding.UTF8, new MediaTypeHeaderValue("application/json"));
 
             // TODO: Replace with your FastAPI endpoint for incidents
@@ -74,19 +114,41 @@
 
             if (response.IsSuccessStatusCode)
             {
-                // Optionally navigate to a confirmation page or incidents list
-                NavigationManager.NavigateTo("/incidents");
+                // Update report count and timestamp using ReportStateService
+                ReportStateService.IncrementReportCount();
+                MemoryCache.Set(LastReportTimestampCacheKey, DateTime.Now);
+
+                statusMessage = "Incidente reportado con éxito!";
+                statusMessageType = "alert-success";
+
+                // Check for rewards
+                int freeEntrances = 0;
+                int currentReports = ReportStateService.ReportsCount; // Get updated count
+                if (currentReports == 5) freeEntrances = 1;
+                else if (currentReports == 25) freeEntrances = 3;
+                else if (currentReports == 100) freeEntrances = 10;
+
+                if (freeEntrances > 0)
+                {
+                    NavigationManager.NavigateTo($"/reward/{freeEntrances}");
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/incidents"); // Navigate back to incidents or a success page
+                }
             }
             else
             {
                 // Handle error
-                Console.WriteLine($"Error al enviar el incidente: {response.StatusCode}");
-                // Log response content for more details
+                statusMessage = $"Error al enviar el incidente: {response.StatusCode}";
+                statusMessageType = "alert-danger";
                 Console.WriteLine(await response.Content.ReadAsStringAsync());
             }
         }
         catch (Exception ex)
         {
+            statusMessage = $"Excepción al enviar el incidente: {ex.Message}";
+            statusMessageType = "alert-danger";
             Console.WriteLine($"Excepción al enviar el incidente: {ex.Message}");
         }
     }

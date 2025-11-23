@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "mD8f0JXCQUE=",
+  "dgSpecHash": "PY7RLsug2Zc=",
   "success": true,
   "projectFilePath": "/mnt/ssd1tb/Codigos/MAI/MAI.csproj",
   "expectedPackageFiles": [
@@ -47,8 +47,11 @@
     "/home/miku/.nuget/packages/microsoft.maui.graphics/9.0.111/microsoft.maui.graphics.9.0.111.nupkg.sha512",
     "/home/miku/.nuget/packages/microsoft.maui.resizetizer/9.0.111/microsoft.maui.resizetizer.9.0.111.nupkg.sha512",
     "/home/miku/.nuget/packages/microsoft.net.illink.tasks/9.0.10/microsoft.net.illink.tasks.9.0.10.nupkg.sha512",
+    "/home/miku/.nuget/packages/microsoft.win32.systemevents/6.0.0/microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "/home/miku/.nuget/packages/plugin.localnotification/12.0.2/plugin.localnotification.12.0.2.nupkg.sha512",
+    "/home/miku/.nuget/packages/qrcoder/1.7.0/qrcoder.1.7.0.nupkg.sha512",
     "/home/miku/.nuget/packages/system.diagnostics.diagnosticsource/10.0.0/system.diagnostics.diagnosticsource.10.0.0.nupkg.sha512",
+    "/home/miku/.nuget/packages/system.drawing.common/6.0.0/system.drawing.common.6.0.0.nupkg.sha512",
     "/home/miku/.nuget/packages/xamarin.android.glide/4.16.0.12/xamarin.android.glide.4.16.0.12.nupkg.sha512",
     "/home/miku/.nuget/packages/xamarin.android.glide.annotations/4.16.0.12/xamarin.android.glide.annotations.4.16.0.12.nupkg.sha512",
     "/home/miku/.nuget/packages/xamarin.android.glide.disklrucache/4.16.0.12/xamarin.android.glide.disklrucache.4.16.0.12.nupkg.sha512",
